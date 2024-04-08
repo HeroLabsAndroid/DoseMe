@@ -1,11 +1,13 @@
 package com.example.doseme.medic;
 
+import com.example.doseme.StatTimeframe;
 import com.example.doseme.Util;
 import com.example.doseme.datproc.DoseSave;
 import com.example.doseme.datproc.IntakeSave;
 import com.example.doseme.datproc.MedLogSave;
 import com.example.doseme.statview.StatViewable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
@@ -58,9 +60,13 @@ public class MedLog implements StatViewable {
     }
 
     public double score_today() {
+        return score_for_day(LocalDate.now());
+    }
+
+    public double score_for_day(LocalDate ld) {
         double out = 0;
         for(Intake it: log) {
-            if(Util.same_day(LocalDateTime.now(), it.getTimestamp())) {
+            if(ld.isEqual(it.getTimestamp().toLocalDate())) {
                 out += it.getDose().getMultiplier();
             }
         }
@@ -85,66 +91,56 @@ public class MedLog implements StatViewable {
 
     }
 
-    public MedLog mk_weeklog() {
-        ArrayList<Intake> wkly_intak = new ArrayList<>();
+    private MedLog log_since(LocalDate ld) {
+        ArrayList<Intake> intak = new ArrayList<>();
 
         if(log.isEmpty()) return new MedLog(getMed());
         else {
             int pos = log.size()-1;
-            int doy = LocalDateTime.now().getDayOfYear();
-            int daycnt = 0;
+            LocalDate tmpday = LocalDate.now();
 
-            while(pos >= 0 && log.get(pos).getTimestamp().isAfter(Util.end_of_day(LocalDateTime.now().minusWeeks(1)))) {
+            while(pos >= 0 && log.get(pos).getTimestamp().toLocalDate().isAfter(ld)) {
                 ArrayList<Intake> dly_intak = new ArrayList<>();
-                while (pos >= 0 && log.get(pos).getTimestamp().getDayOfYear() == doy) {
+                while (pos >= 0 && log.get(pos).getTimestamp().toLocalDate().isEqual(tmpday)) {
 
                     dly_intak.add(log.get(pos));
                     pos--;
 
                 }
-                wkly_intak.add(Intake.combine(dly_intak, LocalDateTime.now().withDayOfYear(doy)));
+                intak.add(Intake.combine(dly_intak, LocalDateTime.now().with(tmpday)));
 
-                doy = (doy==0) ? 365 : doy-1 ;
+                tmpday = tmpday.minusDays(1);
             }
 
             MedLog out = new MedLog(getMed());
-            out.setLog(wkly_intak);
+            out.setLog(intak);
             return out;
         }
+    }
+
+    public MedLog log_for_stattimeframe(StatTimeframe stf) {
+        switch (stf) {
+            case YEARLY:
+                return mk_yearlog();
+            case MONTHLY:
+                return mk_monthlog();
+            case WEEKLY:
+            default:
+                return mk_weeklog();
+        }
+    }
+
+    public MedLog mk_weeklog() {
+        return log_since(LocalDate.now().minusWeeks(1));
     }
 
     public MedLog mk_monthlog() {
-        ArrayList<Intake> mnthl_intak = new ArrayList<>();
-
-        if(log.isEmpty()) return new MedLog(getMed());
-        else {
-            int pos = log.size()-1;
-            int doy = LocalDateTime.now().getDayOfYear();
-            int year = LocalDateTime.now().getYear();
-
-            while(pos >= 0 && log.get(pos).getTimestamp().isAfter(Util.end_of_day(LocalDateTime.now().minusMonths(1)))) {
-                ArrayList<Intake> dly_intak = new ArrayList<>();
-                while (pos >= 0 && log.get(pos).getTimestamp().getDayOfYear() == doy && log.get(pos).getTimestamp().getYear() == year) {
-
-                    dly_intak.add(log.get(pos));
-                    pos--;
-
-                }
-                mnthl_intak.add(Intake.combine(dly_intak, LocalDateTime.now().withDayOfYear(doy)));
-
-                if(doy == 0) {
-                    year--;
-                    doy = (Util.leap_year(LocalDateTime.now())) ? 366 : 365;
-                } else doy--;
-            }
-
-            MedLog out = new MedLog(getMed());
-            out.setLog(mnthl_intak);
-            return out;
-        }
+        return log_since(LocalDate.now().minusMonths(1));
     }
 
-
+    public MedLog mk_yearlog() {
+        return log_since(LocalDate.now().minusYears(1));
+    }
 
     @Override
     public int get_nr_dsets() {

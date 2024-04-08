@@ -64,11 +64,21 @@ public class IntakeAdapter extends RecyclerView.Adapter<IntakeAdapter.ViewHolder
     Context ctx;
 
 
-    public IntakeAdapter(MedLog ml, IntakeStatsDialog c) {
+    boolean allow_remove = true;
+
+
+
+    public void setAllow_remove(boolean allow_remove) {
+        this.allow_remove = allow_remove;
+    }
+
+
+    public IntakeAdapter(MedLog ml, boolean allow_remove, IntakeStatsDialog c) {
         localDataSet = ml.getLog();
         title = ml.getMed().getName();
         listen = (IntakeRemoveListener) c;
         ctx = c.requireContext();
+        this.allow_remove = allow_remove;
     }
 
     public void removeItem(ViewHolder vh, Intake itk) {
@@ -92,12 +102,15 @@ public class IntakeAdapter extends RecyclerView.Adapter<IntakeAdapter.ViewHolder
         holder.getTvMult().setText(String.format(Locale.getDefault(), "%.2f", localDataSet.get(position).getDose().getMultiplier()));
         holder.getTvTS().setText(String.format(Locale.getDefault(),"%2d:%2d", localDataSet.get(position).getTimestamp().getHour(), localDataSet.get(position).getTimestamp().getMinute()));
 
-        holder.getFabRmv().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                removeItem(holder, localDataSet.get(holder.getAdapterPosition()));
-            }
-        });
+        if(allow_remove) {
+            holder.getFabRmv().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    removeItem(holder, localDataSet.get(holder.getAdapterPosition()));
+                }
+            });
+        } else holder.getFabRmv().setVisibility(View.INVISIBLE);
+
     }
 
     @Override

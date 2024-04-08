@@ -2,6 +2,7 @@ package com.example.doseme;
 
 import androidx.annotation.NonNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -14,6 +15,12 @@ public class Util {
         String day = String.format(Locale.getDefault(), (ldt.getDayOfMonth() < 10) ? "0%d" : "%d", ldt.getDayOfMonth());
         String month = String.format(Locale.getDefault(), (ldt.getMonth().getValue() < 10) ? "0%d" : "%d", ldt.getMonth().getValue());
         return String.format(Locale.getDefault(),"%s.%s.%4d", day, month, ldt.getYear());
+    }
+
+    public static String DateToString(LocalDate ld) {
+        String day = String.format(Locale.getDefault(), (ld.getDayOfMonth() < 10) ? "0%d" : "%d", ld.getDayOfMonth());
+        String month = String.format(Locale.getDefault(), (ld.getMonth().getValue() < 10) ? "0%d" : "%d", ld.getMonth().getValue());
+        return String.format(Locale.getDefault(),"%s.%s.%4d", day, month, ld.getYear());
     }
 
     public static String DateTimeToShortString(LocalDateTime ldt) {

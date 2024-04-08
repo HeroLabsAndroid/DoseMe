@@ -35,7 +35,6 @@ public class StatView extends View {
 
     public void setShow_label(boolean show_label) {
         this.show_label = show_label;
-        if(!show_label) show_alt_label = false;
         if(show_label) show_min_label = false;
     }
 
