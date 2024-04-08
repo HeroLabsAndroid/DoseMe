@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="DARK_bg">#FF1B1A2B</color>
+    <color name="LITE_bg">#FFFEFFF8</color>
+    <color name="DARK_txt">#FFCED2EC</color>
+    <color name="DARK_txt_acc1">#FF7ED4DE</color>
+    <color name="LITE_txt">#FF0E1B38</color>
+    <color name="ACC1">#FF12E0A2</color>
+
+    <color name="STVW_bg">#FF36486D</color>
+    <color name="STVW_bar">#FFF347D6</color>
+    <color name="STVW_line">#FFB3CFF6</color>
+    <color name="STVW_txt">#FFF8FBFF</color>
+</resources>

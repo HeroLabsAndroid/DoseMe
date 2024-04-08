@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="4dp">
+
+    <TextView
+        android:id="@+id/TV_intakelist_dose"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:enabled="true"
+        android:scrollIndicators="bottom"
+        android:scrollbars="horizontal"
+        android:scrollHorizontally="true"
+        android:singleLine="false"
+        android:text="TextView"
+        android:textColor="@color/DARK_txt"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/TV_intakelist_ts"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:enabled="true"
+        android:maxLines="1"
+        android:scrollbars="horizontal"
+        android:scrollHorizontally="true"
+        android:singleLine="false"
+        android:text="TextView"
+        android:textColor="@color/DARK_txt_acc1"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/TV_intakelist_mult"
+        app:layout_constraintTop_toTopOf="@+id/TV_intakelist_mult" />
+
+    <TextView
+        android:id="@+id/TV_intakelist_mult"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:maxLines="1"
+        android:scrollbars="horizontal"
+        android:singleLine="false"
+        android:text="TextView"
+        android:textColor="@color/DARK_txt"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@+id/TV_intakelist_dose"
+        app:layout_constraintTop_toBottomOf="@+id/TV_intakelist_dose" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/FAB_intakelist_remove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:clickable="true"
+        app:fabCustomSize="42dp"
+        app:layout_constraintStart_toEndOf="@+id/TV_intakelist_ts"
+        app:layout_constraintTop_toTopOf="@+id/TV_intakelist_dose"
+        app:srcCompat="@android:drawable/ic_input_delete" />
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="4dp"
+        android:background="@color/ACC1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TV_intakelist_ts">
+
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
