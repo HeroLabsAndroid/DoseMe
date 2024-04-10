@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.example.doseme.LimitedRecView.LtdRecyclerView
         android:id="@+id/RCLVW_doses"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -47,6 +47,7 @@
         android:id="@+id/BTN_newmed_confirm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:backgroundTint="#4CAF50"
         android:text="Confirm"
         app:layout_constraintEnd_toEndOf="parent"

@@ -13,4 +13,5 @@
     <color name="STVW_bar">#FFF347D6</color>
     <color name="STVW_line">#FFB3CFF6</color>
     <color name="STVW_txt">#FFF8FBFF</color>
+    <color name="STVW_hilite">#FF6CDCCD</color> //
 </resources>

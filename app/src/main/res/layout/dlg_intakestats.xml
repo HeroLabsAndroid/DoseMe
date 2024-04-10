@@ -22,6 +22,7 @@
         android:id="@+id/TV_intakestats_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="TextView"
         android:textColor="@color/DARK_txt"
         android:textSize="20sp"
@@ -29,7 +30,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.example.doseme.LimitedRecView.LtdRecyclerView
         android:id="@+id/RCLVW_intakestats_intakes"
         android:layout_width="0dp"
         android:layout_height="256dp"

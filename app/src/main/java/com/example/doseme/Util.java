@@ -1,5 +1,8 @@
 package com.example.doseme;
 
+import android.content.Context;
+import android.util.DisplayMetrics;
+
 import androidx.annotation.NonNull;
 
 import java.time.LocalDate;
@@ -51,4 +54,13 @@ public class Util {
         long days_in_year = start_of_year.until(start_of_year.plusYears(1), ChronoUnit.DAYS);
         return (days_in_year > 365);
     }
+
+    public static float dpsToPx(float dps, Context c) {
+        return dps * ((float) c.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    public static float pxToDps(float px, Context c) {
+        return px / ((float) c.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
 }

@@ -17,6 +17,7 @@ import java.util.Locale;
 
 public class StatView extends View {
 
+    public void set_height_padding(int pad) {pad_h = pad;};
     public float getMaxval() {
         return maxval;
     }
@@ -50,11 +51,12 @@ public class StatView extends View {
     private boolean show_alt_label = false;
     private boolean show_label = false;
 
-
+    private int pad_h = 20;
 
     private boolean show_min_label = false;
 
     Paint p = new Paint();
+    Paint p_hi = new Paint();
     Paint txt = new Paint();
     protected float maxval = 1;
     protected int nr_dset = 1;
@@ -110,12 +112,18 @@ public class StatView extends View {
             canvas.drawLine(w_offset, h, w+w_offset, h, p);
 
             p.setColor(ContextCompat.getColor(StatView.this.getContext(), R.color.STVW_bar));
+            p_hi.setColor(ContextCompat.getColor(StatView.this.getContext(), R.color.STVW_hilite));
             double max = data.get_maxval();
             for (int i = 0; i < nr_dset; i++) {
                 String label = data.get_label(i);
                 double val = data.get_val(i);
 
-                canvas.drawRect(w_offset+((i) * (w / (float) nr_dset)+4), (float) ((max-val) / max)*h, w_offset+((i + 1) * (w / (float) nr_dset)-4), h, p);
+                canvas.drawRect(
+                        w_offset+((i) * (w / (float) nr_dset)+4),
+                        (float) ((max-val) / max)*h,
+                        w_offset+((i + 1) * (w / (float) nr_dset)-4),
+                        h,
+                        data.get_highlight_idx().contains((Integer) i) ? p_hi : p);
                 if(show_label) canvas.drawText(label, w_offset+((i) * (w / (float) nr_dset)+8), h+32, txt);
                 else if(show_min_label) canvas.drawText(String.valueOf(data.get_min_label(i)), w_offset+((i) * (w / (float) nr_dset)+8), h+32, txt);
                 if(show_alt_label) canvas.drawText(data.get_alt_label(i), w_offset+((i) * (w / (float) nr_dset)+8), h+64, txt);

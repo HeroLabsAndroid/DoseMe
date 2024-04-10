@@ -179,4 +179,17 @@ public class MedLog implements StatViewable {
 
         return max;
     }
+
+    @Override
+    public ArrayList<Integer> get_highlight_idx() {
+        ArrayList<Integer> out = new ArrayList<>();
+
+        for(int i=0; i<log.size(); i++) {
+            if(log.get(i).getTimestamp().toLocalDate().until(LocalDate.now(), ChronoUnit.DAYS) % 7 == 0) {
+                out.add(i);
+            }
+        }
+
+        return out;
+    }
 }

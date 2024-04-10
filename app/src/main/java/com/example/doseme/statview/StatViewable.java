@@ -1,5 +1,7 @@
 package com.example.doseme.statview;
 
+import java.util.ArrayList;
+
 public interface StatViewable {
     int get_nr_dsets();
     double get_val(int pos);
@@ -10,5 +12,7 @@ public interface StatViewable {
 
     char get_min_label(int pos);
     double get_maxval();
+
+    ArrayList<Integer> get_highlight_idx();
 
 }
