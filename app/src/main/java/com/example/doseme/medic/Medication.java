@@ -3,6 +3,10 @@ package com.example.doseme.medic;
 import com.example.doseme.datproc.DoseSave;
 import com.example.doseme.datproc.MedSave;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class Medication {
@@ -41,6 +45,16 @@ public class Medication {
         this.name = name; this.doses = doses;
     }
 
+    public Medication(JSONObject jsave) throws JSONException {
+        doses = new ArrayList<>();
+        JSONArray jdoses = jsave.getJSONArray("doses");
+        for(int i=0; i<jdoses.length(); i++) {
+            doses.add(new Dose(jdoses.getJSONObject(i)));
+        }
+
+        name = jsave.getString("name");
+    }
+
     //----------------------------------------------------//
 
     public void addDose(Dose ds) {
@@ -58,5 +72,19 @@ public class Medication {
         }
 
         return new MedSave(ds, name);
+    }
+
+    public JSONObject toJSONSave() throws JSONException {
+        JSONObject jsave = new JSONObject();
+
+        JSONArray jdosesaves = new JSONArray();
+        for (Dose d: doses) {
+            jdosesaves.put(d.toJSONSave());
+        }
+
+        jsave.put("doses", jdosesaves);
+        jsave.put("name", name);
+
+        return jsave;
     }
 }

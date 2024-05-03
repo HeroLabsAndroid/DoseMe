@@ -5,7 +5,12 @@ import com.example.doseme.Util;
 import com.example.doseme.datproc.DoseSave;
 import com.example.doseme.datproc.IntakeSave;
 import com.example.doseme.datproc.MedLogSave;
+import com.example.doseme.datproc.MedSave;
 import com.example.doseme.statview.StatViewable;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,6 +35,16 @@ public class MedLog implements StatViewable {
         }
     }
 
+    public MedLog(JSONObject jsave) throws JSONException {
+        med = new Medication(jsave.getJSONObject("med"));
+
+        JSONArray jitksave = jsave.getJSONArray("intakes");
+        log = new ArrayList<>();
+        for(int i=0; i< jitksave.length(); i++) {
+            log.add(new Intake(jitksave.getJSONObject(i)));
+        }
+    }
+
     public MedLogSave toSave() {
         ArrayList<IntakeSave> is = new ArrayList<>();
         for (Intake it: log) {
@@ -37,6 +52,20 @@ public class MedLog implements StatViewable {
         }
 
         return new MedLogSave(med.toSave(), is);
+    }
+
+    public JSONObject toJSONSave() throws JSONException {
+        JSONObject jsave = new JSONObject();
+        jsave.put("med", med.toJSONSave());
+
+        JSONArray jitk = new JSONArray();
+        for(Intake itk: log) {
+            jitk.put(itk.toJSONSave());
+        }
+
+        jsave.put("intakes", jitk);
+
+        return jsave;
     }
 
     public Medication getMed() {

@@ -1,5 +1,8 @@
 package com.example.doseme.datproc;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 public class DoseSave implements Serializable {
@@ -10,4 +13,8 @@ public class DoseSave implements Serializable {
         this.id = id;
         this.multiplier = multiplier;
     }
+
+
+
+
 }

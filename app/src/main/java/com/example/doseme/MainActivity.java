@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -19,6 +20,9 @@ import com.example.doseme.medic.MedLog;
 import com.example.doseme.medic.Medication;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NewMedDialog.NewMedDialogListener {
@@ -39,6 +43,13 @@ public class MainActivity extends AppCompatActivity implements NewMedDialog.NewM
         setContentView(R.layout.activity_main);
 
         logs = DatProc.loadData(this);
+
+        try {
+            String jsavestr = DatProc.saveDataToJSON(this, logs);
+            Log.d("JSON DATA", jsavestr);
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException(e);
+        }
 
         btnNewMed = findViewById(R.id.BTN_main_addmed);
         rclvwMedlist = findViewById(R.id.RCLVW_main_medlist);

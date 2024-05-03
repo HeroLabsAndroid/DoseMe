@@ -2,6 +2,9 @@ package com.example.doseme.medic;
 
 import com.example.doseme.datproc.DoseSave;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class Dose {
@@ -33,7 +36,17 @@ public class Dose {
         this.multiplier = ds.multiplier;
     }
 
+    public Dose(JSONObject jsave) {
+        id = jsave.optString("id", "INVAL");
+        multiplier = jsave.optDouble("mult", 0);
+    }
 
+    public JSONObject toJSONSave() throws JSONException {
+        JSONObject jsave = new JSONObject();
+        jsave.put("id", id);
+        jsave.put("mult", multiplier);
+        return jsave;
+    }
 
     DoseSave toSave() {
         return new DoseSave(id, multiplier);

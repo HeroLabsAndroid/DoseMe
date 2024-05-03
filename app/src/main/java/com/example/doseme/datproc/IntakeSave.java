@@ -1,5 +1,8 @@
 package com.example.doseme.datproc;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -11,4 +14,6 @@ public class IntakeSave implements Serializable {
         this.doseSave = doseSave;
         this.ldt = ldt;
     }
+
+
 }

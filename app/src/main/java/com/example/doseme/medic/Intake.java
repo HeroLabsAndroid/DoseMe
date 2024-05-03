@@ -1,6 +1,11 @@
 package com.example.doseme.medic;
 
+import com.example.doseme.datproc.DoseSave;
 import com.example.doseme.datproc.IntakeSave;
+import com.example.doseme.datproc.LDTsave;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,6 +36,22 @@ public class Intake {
     public Intake(IntakeSave is) {
         this.dose = new Dose(is.doseSave);
         this.ts = is.ldt;
+    }
+
+    public Intake(JSONObject jsave) throws JSONException {
+        ts = (new LDTsave((JSONObject) jsave.opt("ldt"))).toLDT();
+        if(jsave.has("dosesave")) {
+            dose = new Dose(jsave.getJSONObject("dosesave"));
+        }
+    }
+
+    public JSONObject toJSONSave() throws JSONException {
+        JSONObject jsave = new JSONObject();
+
+        jsave.put("dosesave", dose.toJSONSave());
+        jsave.put("ldt", new LDTsave(ts).toJSONSave());
+
+        return jsave;
     }
 
     public static Intake combine(ArrayList<Intake> intakes, LocalDateTime ldt) {
