@@ -8,13 +8,43 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 public class Medication {
     private String name;
 
+    private int timer_minutes;
+
+    private Timer tim;
+
+    private boolean has_timer = false;
     private ArrayList<Dose> doses = new ArrayList<>();
 
     //---------Getter - Setter-----------------------------//
+
+    public Timer getTim() {
+        return tim;
+    }
+
+    public void setTim(Timer tim) {
+        this.tim = tim;
+    }
+
+    public int getTimer_minutes() {
+        return timer_minutes;
+    }
+
+    public void setTimer_minutes(int timer_minutes) {
+        this.timer_minutes = timer_minutes;
+    }
+
+    public boolean isHas_timer() {
+        return has_timer;
+    }
+
+    public void setHas_timer(boolean has_timer) {
+        this.has_timer = has_timer;
+    }
 
     public String getName() {
         return name;
@@ -53,6 +83,10 @@ public class Medication {
         }
 
         name = jsave.getString("name");
+        has_timer = jsave.optBoolean("hastimer", false);
+        if(has_timer) {
+            timer_minutes = jsave.getInt("timer");
+        }
     }
 
     //----------------------------------------------------//
@@ -84,7 +118,15 @@ public class Medication {
 
         jsave.put("doses", jdosesaves);
         jsave.put("name", name);
+        jsave.put("hastimer", has_timer);
+        if(has_timer) {
+            jsave.put("timer", timer_minutes);
+        }
 
         return jsave;
+    }
+
+    public void setTimer() {
+
     }
 }

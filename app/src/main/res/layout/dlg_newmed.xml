@@ -27,17 +27,18 @@
         android:id="@+id/RCLVW_doses"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/BTN_newmed_newdose"
+        app:layout_constraintTop_toBottomOf="@+id/ET_newmed_timer"
         tools:listitem="@layout/lstitm_dose" />
 
     <Button
         android:id="@+id/BTN_newmed_newdose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Dosis definieren"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,5 +54,34 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/RCLVW_doses" />
+
+    <EditText
+        android:id="@+id/ET_newmed_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="number"
+        android:selectAllOnFocus="true"
+        android:text="Notification after"
+        android:textColor="@color/DARK_txt_acc1"
+        app:layout_constraintEnd_toStartOf="@+id/SWTCH_newmed_timer"
+        app:layout_constraintHorizontal_bias="0.02"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/BTN_newmed_newdose" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/SWTCH_newmed_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:textOn="ENBLD"
+        app:layout_constraintBottom_toBottomOf="@+id/ET_newmed_timer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ET_newmed_timer"
+        app:showText="false"
+        app:thumbTint="@color/STVW_bg"
+        app:trackTint="@color/STVW_line" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
