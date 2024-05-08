@@ -53,7 +53,7 @@ public class MedAdapter extends RecyclerView.Adapter<MedAdapter.ViewHolder> impl
             @Override
             public void run() {
                 Intent intent = new Intent(ctx, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_FROM_BACKGROUND);
                 PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 4, intent, PendingIntent.FLAG_IMMUTABLE);
 
                 NotificationCompat.Builder notbuild = new NotificationCompat.Builder(ctx, MainActivity.CHANNEL_ID)
@@ -64,7 +64,7 @@ public class MedAdapter extends RecyclerView.Adapter<MedAdapter.ViewHolder> impl
                                 "Letzte %s Einnahme ist %d Minuten her.",
                                 localDataSet.get(pos).getMed().getName(),
                                 localDataSet.get(pos).getLog().get(localDataSet.get(pos).getLog().size() - 1).getTimestamp().until(LocalDateTime.now(), ChronoUnit.MINUTES)))
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setContentIntent(pendingIntent);
 
 
@@ -79,6 +79,7 @@ public class MedAdapter extends RecyclerView.Adapter<MedAdapter.ViewHolder> impl
                     return;
                 }
                 NotificationManagerCompat.from(ctx).notify(pos, notbuild.build());
+                hold.getTvDebug().setText(String.format(Locale.getDefault(), "%d (OFF)", (long) localDataSet.get(pos).getMed().getTimer_minutes()));
 
                 Snackbar.make(hold.getTvName(), "ding dong", BaseTransientBottomBar.LENGTH_SHORT).show();
 
@@ -100,7 +101,7 @@ public class MedAdapter extends RecyclerView.Adapter<MedAdapter.ViewHolder> impl
 
             localDataSet.get(pos).getMed().setTim(new Timer());
             localDataSet.get(pos).getMed().getTim().schedule(getTimerTask(pos), (long) localDataSet.get(pos).getMed().getTimer_minutes() *1000*60);
-            //hold.getTvDebug().setText(String.format(Locale.getDefault(), "%d (ON)", (long) localDataSet.get(pos).getMed().getTimer_minutes()));
+            hold.getTvDebug().setText(String.format(Locale.getDefault(), "%d (ON)", (long) localDataSet.get(pos).getMed().getTimer_minutes()));
             notifyItemChanged(pos);
         }
         try {
