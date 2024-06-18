@@ -1,5 +1,7 @@
 package com.example.doseme;
 
+import static androidx.core.app.ActivityCompat.startActivityForResult;
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -9,11 +11,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -35,9 +41,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NewMedDialog.NewMedDialogListener {
 
+    //TODO: Data export/import hübscher
     ArrayList<MedLog> logs = new ArrayList<>();
 
-    Button btnNewMed;
+    Button btnNewMed, btnImport, btnExport;
     RecyclerView rclvwMedlist;
 
     public static String CHANNEL_ID = "NOTCHAN";
@@ -56,6 +63,69 @@ public class MainActivity extends AppCompatActivity implements NewMedDialog.NewM
             // or other notification behaviors after this.
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    public void export_dat() {
+        //Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+
+
+        //startActivityForResult(intent, 3);
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TITLE, "medlogsave");
+
+        // Optionally, specify a URI for the directory that should be opened in
+        // the system file picker when your app creates the document.
+        //intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
+
+        startActivityForResult(intent, 3);
+
+    }
+
+    public void import_dat() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/plain");
+
+
+        startActivityForResult(intent, 4);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        if (requestCode == 3 && resultCode == Activity.RESULT_OK) {
+            // The result data contains a URI for the document or directory that
+            // the user selected.
+            Uri uri = null;
+            if (resultData != null) {
+                uri =resultData.getData();
+
+                if(DatProc.exportData(logs, uri, getContentResolver())) {
+                    Snackbar.make(this, btnExport, "Exported "+logs.size()+" logs!", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    Snackbar.make(this, btnExport, "Error exporting "+logs.size()+" logs :(", BaseTransientBottomBar.LENGTH_SHORT).show();
+                }
+            }
+        }
+        else if(requestCode == 4 && resultCode == Activity.RESULT_OK) {
+            Uri uri = null;
+            if (resultData != null) {
+                uri =resultData.getData();
+
+                logs = DatProc.importData(uri, getContentResolver());
+                assert logs != null;
+                if(!logs.isEmpty()) {
+                    Snackbar.make(this, btnExport, "Imported "+logs.size()+" logs!", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    rclvwMedlist.setAdapter(new MedAdapter(logs, this, getSupportFragmentManager()));
+                    save_dat();
+                } else {
+                    Snackbar.make(this, btnExport, "Error importing "+logs.size()+" logs :(", BaseTransientBottomBar.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 
@@ -80,7 +150,23 @@ public class MainActivity extends AppCompatActivity implements NewMedDialog.NewM
         }
 
         btnNewMed = findViewById(R.id.BTN_main_addmed);
+        btnExport = findViewById(R.id.BTNexport);
+        btnImport = findViewById(R.id.BTNimport);
         rclvwMedlist = findViewById(R.id.RCLVW_main_medlist);
+
+        btnExport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                export_dat();
+            }
+        });
+
+        btnImport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                import_dat();
+            }
+        });
 
 
         btnNewMed.setOnClickListener(new View.OnClickListener() {
