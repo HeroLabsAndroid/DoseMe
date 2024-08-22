@@ -118,10 +118,12 @@ public class StatView extends View {
                 String label = data.get_label(i);
                 double val = data.get_val(i);
 
+                float barwidth = w/(float) nr_dset;
+
                 canvas.drawRect(
-                        w_offset+((i) * (w / (float) nr_dset)+4),
+                        w_offset+((i) * (barwidth)+barwidth/16),
                         (float) ((max-val) / max)*h,
-                        w_offset+((i + 1) * (w / (float) nr_dset)-4),
+                        w_offset+((i + 1) * (barwidth)-barwidth/16),
                         h,
                         data.get_highlight_idx().contains((Integer) i) ? p_hi : p);
                 if(show_label) canvas.drawText(label, w_offset+((i) * (w / (float) nr_dset)+8), h+32, txt);
