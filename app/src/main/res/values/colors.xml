@@ -10,8 +10,8 @@
     <color name="ACC1">#FF12E0A2</color>
 
     <color name="STVW_bg">#FF36486D</color>
-    <color name="STVW_bar">#FFF347D6</color>
+    <color name="STVW_bar">#FF221F44</color>
     <color name="STVW_line">#FFB3CFF6</color>
     <color name="STVW_txt">#FFF8FBFF</color>
-    <color name="STVW_hilite">#FF6CDCCD</color> //
+    <color name="STVW_hilite">#FFF8F7F3</color> //
 </resources>
