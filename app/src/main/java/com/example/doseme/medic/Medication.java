@@ -1,12 +1,21 @@
 package com.example.doseme.medic;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+
 import com.example.doseme.datproc.DoseSave;
+import com.example.doseme.datproc.LDTsave;
 import com.example.doseme.datproc.MedSave;
+import com.example.doseme.notif.AlarmItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Timer;
 
@@ -15,19 +24,29 @@ public class Medication {
 
     private int timer_minutes;
 
-    private Timer tim;
-
+    private String debugMsg = " ";
     private boolean has_timer = false;
+
+    private LocalDateTime timer_set_at;
     private ArrayList<Dose> doses = new ArrayList<>();
 
     //---------Getter - Setter-----------------------------//
 
-    public Timer getTim() {
-        return tim;
+
+    public LocalDateTime getTimer_set_at() {
+        return timer_set_at;
     }
 
-    public void setTim(Timer tim) {
-        this.tim = tim;
+    public void setTimer_set_at(LocalDateTime timer_set_at) {
+        this.timer_set_at = timer_set_at;
+    }
+
+    public String getDebugMsg() {
+        return debugMsg;
+    }
+
+    public void setDebugMsg(String debugMsg) {
+        this.debugMsg = debugMsg;
     }
 
     public int getTimer_minutes() {
@@ -36,6 +55,7 @@ public class Medication {
 
     public void setTimer_minutes(int timer_minutes) {
         this.timer_minutes = timer_minutes;
+        debugMsg = ""+timer_minutes;
     }
 
     public boolean isHas_timer() {
@@ -44,6 +64,7 @@ public class Medication {
 
     public void setHas_timer(boolean has_timer) {
         this.has_timer = has_timer;
+        debugMsg = has_timer ? ""+timer_minutes : "No Timer";
     }
 
     public String getName() {
@@ -87,6 +108,10 @@ public class Medication {
         if(has_timer) {
             timer_minutes = jsave.getInt("timer");
         }
+        LDTsave timerat = (LDTsave) jsave.opt("timerset");
+        if(timerat != null)
+            timer_set_at = timerat.toLDT();
+        debugMsg = has_timer ? ""+timer_minutes : "No Timer";
     }
 
     //----------------------------------------------------//
@@ -121,12 +146,20 @@ public class Medication {
         jsave.put("hastimer", has_timer);
         if(has_timer) {
             jsave.put("timer", timer_minutes);
+            if(timer_set_at!=null) jsave.put("timerset", new LDTsave(timer_set_at));
         }
 
         return jsave;
     }
 
-    public void setTimer() {
-
+    public String getNotifChannelID() {
+        return "c"+name.hashCode();
     }
+
+    public void mkNotifChannel(Context c) {
+        NotificationChannel notchan = new NotificationChannel(getNotifChannelID(), "notif_"+name, NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationManager notman = c.getSystemService(NotificationManager.class);
+        notman.createNotificationChannel(notchan);
+    }
+
 }

@@ -1,16 +1,13 @@
 package com.example.doseme.datadapt;
 
 
-import static android.icu.number.NumberFormatter.with;
-
-import android.Manifest;
-import android.app.Notification;
-import android.app.PendingIntent;
+import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,15 +15,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.doseme.MainActivity;
 import com.example.doseme.R;
 import com.example.doseme.datproc.DatProc;
 import com.example.doseme.dialog.ChooseDoseDialog;
@@ -36,58 +32,17 @@ import com.example.doseme.medic.Dose;
 import com.example.doseme.medic.Intake;
 import com.example.doseme.medic.MedLog;
 import com.example.doseme.medic.Medication;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.example.doseme.notif.AlarmItem;
+import com.example.doseme.notif.DoseMeAlarmScheduler;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MedAdapter extends RecyclerView.Adapter<MedAdapter.ViewHolder> implements ChooseDoseDialog.DoseChosenListener, NewMedDialog.MedChangedListener {
 
-    public TimerTask getTimerTask(int pos) {
-        TimerTask timtas = new TimerTask() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(ctx, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_FROM_BACKGROUND);
-                PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 4, intent, PendingIntent.FLAG_IMMUTABLE);
-
-                NotificationCompat.Builder notbuild = new NotificationCompat.Builder(ctx, MainActivity.CHANNEL_ID)
-                        .setAutoCancel(true)
-                        .setSmallIcon(R.drawable.icon)
-                        .setContentTitle("achtung achtung")
-                        .setContentText(String.format(Locale.getDefault(),
-                                "Letzte %s Einnahme ist %d Minuten her.",
-                                localDataSet.get(pos).getMed().getName(),
-                                localDataSet.get(pos).getLog().get(localDataSet.get(pos).getLog().size() - 1).getTimestamp().until(LocalDateTime.now(), ChronoUnit.MINUTES)))
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setContentIntent(pendingIntent);
-
-
-                if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                NotificationManagerCompat.from(ctx).notify(pos, notbuild.build());
-                hold.getTvDebug().setText(String.format(Locale.getDefault(), "%d (OFF)", (long) localDataSet.get(pos).getMed().getTimer_minutes()));
-
-                Snackbar.make(hold.getTvName(), "ding dong", BaseTransientBottomBar.LENGTH_SHORT).show();
-
-            }
-        };
-
-        return timtas;
-    }
 
     public void openChooseDoseDialog(int pos) {
         ChooseDoseDialog cdDial = new ChooseDoseDialog(this, pos, localDataSet.get(pos).getMed().getDoses(), localDataSet.get(pos).getMed().getName());
@@ -98,11 +53,15 @@ public class MedAdapter extends RecyclerView.Adapter<MedAdapter.ViewHolder> impl
     public void onDoseChosen(Dose dose, int pos) {
         localDataSet.get(pos).takeMeds(new Intake(dose, LocalDateTime.now()));
         if(localDataSet.get(pos).getMed().isHas_timer()) {
+            AlarmItem item = new AlarmItem(
+                    LocalDateTime.now().plusMinutes(localDataSet.get(pos).getMed().getTimer_minutes()),
+                    "Achtung Achtung, letzte "+localDataSet.get(pos).getMed().getName()+"-Einnahme ist "+localDataSet.get(pos).getMed().getTimer_minutes()+" Minuten her.",
+                    localDataSet.get(pos).getMed().getNotifChannelID(), pos);
 
-            localDataSet.get(pos).getMed().setTim(new Timer());
-            localDataSet.get(pos).getMed().getTim().schedule(getTimerTask(pos), (long) localDataSet.get(pos).getMed().getTimer_minutes() *1000*60);
-            hold.getTvDebug().setText(String.format(Locale.getDefault(), "%d (ON)", (long) localDataSet.get(pos).getMed().getTimer_minutes()));
+            dmaSchedule.schedule(item);
+            localDataSet.get(pos).getMed().setTimer_set_at(LocalDateTime.now());
             notifyItemChanged(pos);
+            Snackbar.make(hold.itemView, localDataSet.get(pos).getMed().getName()+"-Alarm set at "+ LocalDateTime.now().toString()+" for "+LocalDateTime.now().plusMinutes(localDataSet.get(pos).getMed().getTimer_minutes()).toString(), Snackbar.LENGTH_LONG).show();
         }
         try {
             DatProc.saveDataToJSON(ctx, localDataSet);
@@ -175,12 +134,15 @@ public class MedAdapter extends RecyclerView.Adapter<MedAdapter.ViewHolder> impl
 
     FragmentManager fragMan;
 
+    DoseMeAlarmScheduler dmaSchedule;
+
     ViewHolder hold;
 
-    public MedAdapter(ArrayList<MedLog> logs, Context ctx, FragmentManager fm) {
+    public MedAdapter(ArrayList<MedLog> logs, Context ctx, FragmentManager fm, DoseMeAlarmScheduler dmaSchedule) {
         localDataSet = logs;
         this.ctx = ctx;
         fragMan = fm;
+        this.dmaSchedule = dmaSchedule;
     }
 
 
@@ -197,10 +159,16 @@ public class MedAdapter extends RecyclerView.Adapter<MedAdapter.ViewHolder> impl
         hold = holder;
         holder.getTvName().setText(localDataSet.get(position).getMed().getName());
 
-        if(localDataSet.get(position).getMed().isHas_timer()) {
-            holder.getTvDebug().setText(
-                    String.format(Locale.getDefault(), "%d", localDataSet.get(position).getMed().getTimer_minutes()));
-        } else holder.getTvDebug().setText("No timer");
+        if(!localDataSet.get(position).getMed().isHas_timer())
+            holder.getTvDebug().setText("No Timer");
+        else if(localDataSet.get(position).getMed().getTimer_set_at()==null)
+            holder.getTvDebug().setText(String.format(Locale.getDefault(),"%d min", localDataSet.get(position).getMed().getTimer_minutes()));
+        else if(localDataSet.get(position).getMed().getTimer_set_at().plusMinutes(localDataSet.get(position).getMed().getTimer_minutes()).isBefore(LocalDateTime.now())) {
+            localDataSet.get(position).getMed().setTimer_set_at(null);
+            holder.getTvDebug().setText(String.format(Locale.getDefault(),"%d min", localDataSet.get(position).getMed().getTimer_minutes()));
+        } else {
+            holder.getTvDebug().setText(String.format(Locale.getDefault(),"FIRE AWAY (in %d min)", LocalDateTime.now().until(localDataSet.get(position).getMed().getTimer_set_at().plusMinutes(localDataSet.get(position).getMed().getTimer_minutes()), ChronoUnit.MINUTES)));
+        }
 
         holder.getBtnTake().setOnClickListener(new View.OnClickListener() {
             @Override

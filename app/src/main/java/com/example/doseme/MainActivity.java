@@ -5,15 +5,20 @@ import static androidx.core.app.ActivityCompat.startActivityForResult;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -31,12 +36,14 @@ import com.example.doseme.dialog.NewMedDialog;
 import com.example.doseme.medic.Dose;
 import com.example.doseme.medic.MedLog;
 import com.example.doseme.medic.Medication;
+import com.example.doseme.notif.DoseMeAlarmScheduler;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NewMedDialog.NewMedDialogListener {
@@ -46,23 +53,19 @@ public class MainActivity extends AppCompatActivity implements NewMedDialog.NewM
 
     Button btnNewMed, btnImport, btnExport;
     RecyclerView rclvwMedlist;
+    ArrayList<String> notif_chnls = new ArrayList<>();
 
-    public static String CHANNEL_ID = "NOTCHAN";
+    DoseMeAlarmScheduler dmaSchedule;
+
+    //public static String CHANNEL_ID = "NOTCHAN";
     public static int NOTPERMREQCODE = 420;
 
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is not in the Support Library.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.channel_name);
-            String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this.
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+
+
+    private void createNotificationChannels() {
+        for(MedLog ml: logs) {
+            ml.getMed().mkNotifChannel(this);
+            notif_chnls.add(ml.getMed().getNotifChannelID());
         }
     }
 
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements NewMedDialog.NewM
                 assert logs != null;
                 if(!logs.isEmpty()) {
                     Snackbar.make(this, btnExport, "Imported "+logs.size()+" logs!", BaseTransientBottomBar.LENGTH_SHORT).show();
-                    rclvwMedlist.setAdapter(new MedAdapter(logs, this, getSupportFragmentManager()));
+                    rclvwMedlist.setAdapter(new MedAdapter(logs, this, getSupportFragmentManager(), dmaSchedule));
                     save_dat();
                 } else {
                     Snackbar.make(this, btnExport, "Error importing "+logs.size()+" logs :(", BaseTransientBottomBar.LENGTH_SHORT).show();
@@ -180,8 +183,11 @@ public class MainActivity extends AppCompatActivity implements NewMedDialog.NewM
             }
         });
 
+        dmaSchedule = new DoseMeAlarmScheduler(this);
+        createNotificationChannels();
+
         rclvwMedlist.setLayoutManager(new LinearLayoutManager(this));
-        MedAdapter medAdapt = new MedAdapter(logs, this, getSupportFragmentManager());
+        MedAdapter medAdapt = new MedAdapter(logs, this, getSupportFragmentManager(), dmaSchedule);
         rclvwMedlist.setAdapter(medAdapt);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -189,8 +195,6 @@ public class MainActivity extends AppCompatActivity implements NewMedDialog.NewM
         } else {
             Snackbar.make(this, rclvwMedlist, "Notification permission already given.", BaseTransientBottomBar.LENGTH_SHORT).show();
         }
-
-        createNotificationChannel();
 
     }
 
@@ -204,8 +208,6 @@ public class MainActivity extends AppCompatActivity implements NewMedDialog.NewM
             rclvwMedlist.getAdapter().notifyItemRangeChanged(logs.size()-1, 1);
             save_dat();
         }
-
-
     }
 
 

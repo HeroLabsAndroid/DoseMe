@@ -22,6 +22,8 @@ import java.util.Locale;
 public class MedLog implements StatViewable {
     private Medication med;
 
+
+
     private ArrayList<Intake> log = new ArrayList<>();
 
     public MedLog(Medication med) {

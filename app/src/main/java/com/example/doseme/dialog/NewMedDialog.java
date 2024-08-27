@@ -132,7 +132,6 @@ public class NewMedDialog extends DialogFragment implements NewDoseDialog.NewDos
                     med.setHas_timer(swtchTimer.isChecked());
                     if(swtchTimer.isChecked()) {
                         med.setTimer_minutes(Integer.parseInt(etTimer.getText().toString()));
-                        med.setTim(new Timer());
                     }
                     mchnglist.onMedChanged(NewMedDialog.this, med, pos);
                 }
