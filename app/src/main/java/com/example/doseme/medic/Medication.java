@@ -108,9 +108,11 @@ public class Medication {
         if(has_timer) {
             timer_minutes = jsave.getInt("timer");
         }
-        LDTsave timerat = (LDTsave) jsave.opt("timerset");
-        if(timerat != null)
-            timer_set_at = timerat.toLDT();
+
+        JSONObject jtimerset = (JSONObject) jsave.opt("timerset");
+
+        if(jtimerset != null)
+            timer_set_at = new LDTsave(jtimerset).toLDT();
         debugMsg = has_timer ? ""+timer_minutes : "No Timer";
     }
 
@@ -146,7 +148,7 @@ public class Medication {
         jsave.put("hastimer", has_timer);
         if(has_timer) {
             jsave.put("timer", timer_minutes);
-            if(timer_set_at!=null) jsave.put("timerset", new LDTsave(timer_set_at));
+            if(timer_set_at!=null) jsave.put("timerset", new LDTsave(timer_set_at).toJSONSave());
         }
 
         return jsave;

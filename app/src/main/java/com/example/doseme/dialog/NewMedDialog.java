@@ -44,8 +44,6 @@ public class NewMedDialog extends DialogFragment implements NewDoseDialog.NewDos
     }
 
 
-
-
     public NewMedDialog() {
         change = false;
     }
@@ -75,6 +73,7 @@ public class NewMedDialog extends DialogFragment implements NewDoseDialog.NewDos
     }
 
     EditText etName, etTimer;
+
     Button btnNewDose, btnConfirm;
 
     SwitchMaterial swtchTimer;
@@ -85,9 +84,7 @@ public class NewMedDialog extends DialogFragment implements NewDoseDialog.NewDos
 
     MedChangedListener mchnglist;
 
-
     ArrayList<Dose> doses = new ArrayList<>();
-
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -120,12 +117,16 @@ public class NewMedDialog extends DialogFragment implements NewDoseDialog.NewDos
             }
         });
 
-
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!change) {
-                    listener.onNewMedConfirmBtnClick(NewMedDialog.this, new Medication(etName.getText().toString(), doses));
+                    Medication medi = new Medication(etName.getText().toString(), doses);
+                    medi.setHas_timer(swtchTimer.isChecked());
+                    if(swtchTimer.isChecked()) {
+                        med.setTimer_minutes(Integer.parseInt(etTimer.getText().toString()));
+                    }
+                    listener.onNewMedConfirmBtnClick(NewMedDialog.this, med);
                 } else {
                     med.setDoses(doses);
                     med.setName(etName.getText().toString());
