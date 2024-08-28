@@ -210,11 +210,17 @@ public class MainActivity extends AppCompatActivity implements NewMedDialog.NewM
         }
     }
 
-
+    @Override
+    protected void onResume() {
+        rclvwMedlist.getAdapter().notifyDataSetChanged();
+        super.onResume();
+    }
 
     @Override
     protected void onStop() {
         save_dat();
         super.onStop();
     }
+
+
 }

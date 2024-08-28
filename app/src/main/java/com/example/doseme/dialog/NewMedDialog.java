@@ -124,9 +124,9 @@ public class NewMedDialog extends DialogFragment implements NewDoseDialog.NewDos
                     Medication medi = new Medication(etName.getText().toString(), doses);
                     medi.setHas_timer(swtchTimer.isChecked());
                     if(swtchTimer.isChecked()) {
-                        med.setTimer_minutes(Integer.parseInt(etTimer.getText().toString()));
+                        medi.setTimer_minutes(Integer.parseInt(etTimer.getText().toString()));
                     }
-                    listener.onNewMedConfirmBtnClick(NewMedDialog.this, med);
+                    listener.onNewMedConfirmBtnClick(NewMedDialog.this, medi);
                 } else {
                     med.setDoses(doses);
                     med.setName(etName.getText().toString());
