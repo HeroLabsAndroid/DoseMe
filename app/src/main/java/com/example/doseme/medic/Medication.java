@@ -159,7 +159,7 @@ public class Medication {
     }
 
     public void mkNotifChannel(Context c) {
-        NotificationChannel notchan = new NotificationChannel(getNotifChannelID(), "notif_"+name, NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel notchan = new NotificationChannel(getNotifChannelID(), "notif_"+name, NotificationManager.IMPORTANCE_HIGH);
         NotificationManager notman = c.getSystemService(NotificationManager.class);
         notman.createNotificationChannel(notchan);
     }

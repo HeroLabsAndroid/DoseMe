@@ -33,7 +33,7 @@ public class DoseMeAlarmScheduler implements AlarmScheduler{
             if(alarmMan.canScheduleExactAlarms()) {
                 set_alarm(item, intent);
             } else {
-                Log.e("ALARMSCHEDULE", "Not allowed to set exact notifs");
+               Log.e("ALARMSCHEDULE", "Not allowed to set exact notifs");
             }
         } else set_alarm(item, intent);
 

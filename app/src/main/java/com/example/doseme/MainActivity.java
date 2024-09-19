@@ -183,8 +183,9 @@ public class MainActivity extends AppCompatActivity implements NewMedDialog.NewM
             }
         });
 
-        dmaSchedule = new DoseMeAlarmScheduler(this);
         createNotificationChannels();
+        dmaSchedule = new DoseMeAlarmScheduler(this);
+
 
         rclvwMedlist.setLayoutManager(new LinearLayoutManager(this));
         MedAdapter medAdapt = new MedAdapter(logs, this, getSupportFragmentManager(), dmaSchedule);
